@@ -44,8 +44,8 @@ export default function VideoCallPage() {
   const [newMessage, setNewMessage] = useState("");
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null); // Track camera permission
 
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null); // User's video (PiP)
+  const remoteVideoRef = useRef<HTMLVideoElement>(null); // Doctor's video (Main)
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast(); // Initialize useToast
 
@@ -56,6 +56,7 @@ export default function VideoCallPage() {
         setHasCameraPermission(null); // Reset permission state on attempt
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            // Assign user's stream to the local video element (PiP)
             if (localVideoRef.current) {
               localVideoRef.current.srcObject = stream;
             }
@@ -63,7 +64,7 @@ export default function VideoCallPage() {
             console.log("Local media stream acquired.");
             setCallStatus("connected"); // Move to connected only after getting media
 
-            // Simulate doctor's video (remote) - Using a placeholder image for now
+            // Simulate doctor's video (remote) - Assign placeholder stream to the remote video element (Main)
             if (remoteVideoRef.current) {
                 // In a real app, this would be the WebRTC remote stream
                 const canvas = document.createElement('canvas');
@@ -157,6 +158,7 @@ export default function VideoCallPage() {
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
     console.log(newMutedState ? "Muting" : "Unmuting");
+     // Mute/unmute the user's local stream (in PiP)
      if (localVideoRef.current?.srcObject) {
       (localVideoRef.current.srcObject as MediaStream).getAudioTracks().forEach(track => {
          track.enabled = !newMutedState; // Enable track if NOT muted
@@ -169,6 +171,7 @@ export default function VideoCallPage() {
     const newVideoOffState = !isVideoOff;
     setIsVideoOff(newVideoOffState);
     console.log(newVideoOffState ? "Turning video off" : "Turning video on");
+     // Enable/disable the user's local video track (in PiP)
      if (localVideoRef.current?.srcObject) {
       (localVideoRef.current.srcObject as MediaStream).getVideoTracks().forEach(track => {
          track.enabled = !newVideoOffState; // Enable track if video is ON
@@ -290,19 +293,20 @@ export default function VideoCallPage() {
         {/* Video Feeds & Status */}
         <div className="flex-1 bg-muted relative flex items-center justify-center overflow-hidden">
           {/* Always render video tags to prevent race conditions */}
+          {/* Main Video (Doctor - remote) */}
           <video
+             ref={remoteVideoRef}
+             autoPlay
+             playsInline
+             className={`w-full h-full object-cover transition-opacity duration-300 ${callStatus === 'connected' ? 'opacity-100' : 'opacity-0'}`}
+           />
+            {/* Picture-in-Picture (User - local) */}
+            <video
              ref={localVideoRef}
              autoPlay
              playsInline
              muted // Mute local playback to avoid echo
-             className={`w-full h-full object-cover transition-opacity duration-300 ${callStatus === 'connected' && hasCameraPermission ? 'opacity-100' : 'opacity-0'}`}
-           />
-            {/* Remote video needs careful handling - often uses WebRTC object */}
-            <video
-             ref={remoteVideoRef}
-             autoPlay
-             playsInline
-             className={`absolute bottom-4 right-4 w-40 h-30 rounded-md overflow-hidden border-2 border-white shadow-md bg-secondary object-cover transition-opacity duration-300 ${callStatus === 'connected' ? 'opacity-100' : 'opacity-0'}`}
+             className={`absolute bottom-4 right-4 w-40 h-30 rounded-md overflow-hidden border-2 border-white shadow-md bg-secondary object-cover transition-opacity duration-300 ${callStatus === 'connected' && hasCameraPermission ? 'opacity-100' : 'opacity-0'}`}
            />
 
           {/* Status Overlays */}
@@ -324,25 +328,28 @@ export default function VideoCallPage() {
            )}
            {callStatus === "connected" && hasCameraPermission && (
              <>
-               {/* Picture-in-Picture (Doctor - remote) Name Tag */}
+               {/* Name Tag for Main Video (Doctor) */}
+               <div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded text-sm flex items-center">
+                 <User className="w-4 h-4 mr-1" />
+                 {mockDoctor.name}
+               </div>
+
+               {/* Picture-in-Picture (You - local) Name Tag */}
                <div className="absolute bottom-4 right-4 w-40 h-30"> {/* Container for PiP video and tag */}
-                   {/* Name Tag for PiP */}
+                  {/* Show overlay if local video is off */}
+                 {isVideoOff && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-white rounded-md">
+                        <VideoOff className="w-10 h-10 mb-1" />
+                        <p className="text-xs">Video Off</p>
+                    </div>
+                 )}
+                  {/* Name Tag for PiP */}
                   <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-2 py-0.5 rounded text-xs flex items-center whitespace-nowrap">
-                    <User className="w-3 h-3 mr-1" /> {mockDoctor.name.split(' ')[1]} {/* Show only last name */}
+                    {isMuted ? <MicOff className="w-3 h-3 mr-1" /> : <Mic className="w-3 h-3 mr-1" />}
+                    You
                   </div>
                </div>
-                {/* Name Tag for Main Video (You) */}
-               <div className="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded text-sm flex items-center">
-                 {isMuted ? <MicOff className="w-4 h-4 mr-1" /> : <Mic className="w-4 h-4 mr-1" />}
-                 You
-               </div>
-               {/* Show overlay if local video is off */}
-                {isVideoOff && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-white">
-                        <VideoOff className="w-12 h-12 mb-2" />
-                        <p>Your video is off</p>
-                    </div>
-                )}
+
              </>
            )}
            {callStatus === "disconnected" && showCallEndedAlert && ( // Only show when alert is active
@@ -478,5 +485,3 @@ export default function VideoCallPage() {
     </div>
   );
 }
-
-    
