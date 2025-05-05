@@ -17,12 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          GeistSans.variable,
-          GeistMono.variable
+          // The variables are now applied in the html tag
+          // GeistSans.variable,
+          // GeistMono.variable
         )}
       >
         <div className="relative flex min-h-screen flex-col">

@@ -81,13 +81,15 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans; /* Use sans font */
+    @apply bg-background text-foreground font-sans; /* Use font-sans from tailwind config */
     font-feature-settings: "rlig" 1,"calt" 1; /* Enable ligatures */
   }
 }
 
-/* Ensure Geist font variables are available if not using next/font */
-:root {
-  --font-geist-sans: "Geist Variable", sans-serif;
-  --font-geist-mono: "Geist Mono Variable", monospace;
-}
+/*
+  Remove manual font variable definitions as next/font handles this.
+ :root {
+   --font-geist-sans: "Geist Variable", sans-serif;
+   --font-geist-mono: "Geist Mono Variable", monospace;
+ }
+*/
