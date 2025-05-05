@@ -1,11 +1,14 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { HeartPulse, Activity } from 'lucide-react';
+import { HeartPulse, Activity, Link as LinkIcon, Link2Off } from 'lucide-react'; // Added LinkIcon, Link2Off
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { getHeartRate, type HeartRateData } from '@/services/heart-rate'; // Assuming service exists
+import { Button } from "@/components/ui/button"; // Added Button
+import { useToast } from "@/hooks/use-toast"; // Added useToast
 
 // Chart configuration (optional, for ShadCN charts)
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -21,13 +24,21 @@ const chartConfig = {
 export default function HeartTrackerPage() {
   const [heartRateData, setHeartRateData] = useState<HeartRateData[]>([]);
   const [currentBpm, setCurrentBpm] = useState<number | null>(null);
-  const [status, setStatus] = useState<'connecting' | 'active' | 'error' | 'idle'>('connecting');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sensorStatus, setSensorStatus] = useState<'connecting' | 'active' | 'error' | 'idle'>('connecting');
+  const [sensorErrorMessage, setSensorErrorMessage] = useState<string | null>(null);
 
-  // Simulate fetching real-time heart rate data
+  // --- Google Fit State ---
+  const [isGoogleFitConnected, setIsGoogleFitConnected] = useState(false);
+  const [isConnectingToGoogleFit, setIsConnectingToGoogleFit] = useState(false);
+  const [googleFitError, setGoogleFitError] = useState<string | null>(null);
+  const { toast } = useToast();
+  // --- End Google Fit State ---
+
+
+  // Simulate fetching real-time heart rate data from sensor
   useEffect(() => {
-    setStatus('connecting');
-    setErrorMessage(null);
+    setSensorStatus('connecting');
+    setSensorErrorMessage(null);
 
     // Placeholder: In a real app, connect to the sensor (Bluetooth, etc.)
     console.log("Attempting to connect to heart rate sensor...");
@@ -37,23 +48,24 @@ export default function HeartTrackerPage() {
             const initialData = await getHeartRate(); // Get initial reading
             setCurrentBpm(initialData.bpm);
             setHeartRateData([{ ...initialData, timestamp: Date.now() }]); // Use current timestamp for chart
-            setStatus('active');
+            setSensorStatus('active');
             console.log("Sensor connected, initial reading:", initialData.bpm);
         } catch (error) {
             console.error("Failed to get initial heart rate:", error);
-            setStatus('error');
-            setErrorMessage("Failed to connect to sensor. Please ensure it's paired and nearby.");
+            setSensorStatus('error');
+            setSensorErrorMessage("Failed to connect to sensor. Please ensure it's paired and nearby.");
         }
     };
 
     initialFetch(); // Call the async function
 
-    // Simulate continuous data stream
+    // Simulate continuous data stream from sensor
     const intervalId = setInterval(async () => {
-      if (status === 'active' || status === 'connecting') { // Only fetch if active or still trying
+      // Only fetch if sensor is active or connecting, AND Google Fit is NOT the primary source (for this simulation)
+      if ((sensorStatus === 'active' || sensorStatus === 'connecting') /* && !isGoogleFitConnected */) {
         try {
-          const newData = await getHeartRate(); // This needs to be adapted for real streaming
-          const timestamp = Date.now(); // Use consistent timestamping
+          const newData = await getHeartRate();
+          const timestamp = Date.now();
 
            // Simulate slight variations for demo purposes
           const simulatedBpm = newData.bpm + Math.floor(Math.random() * 5) - 2; // +/- 2 variation
@@ -62,16 +74,13 @@ export default function HeartTrackerPage() {
           setCurrentBpm(simulatedData.bpm);
           setHeartRateData((prevData) => {
             const updatedData = [...prevData, simulatedData];
-            // Keep only the last 60 data points (e.g., last minute if 1 reading/sec)
+            // Keep only the last 60 data points
             return updatedData.slice(-60);
           });
-           if (status === 'connecting') setStatus('active'); // Mark as active after first successful read in interval
+           if (sensorStatus === 'connecting') setSensorStatus('active');
         } catch (error) {
           console.error("Error fetching heart rate update:", error);
-          // Handle intermittent errors, maybe retry or show a warning
-           // Avoid setting global error state for intermittent issues unless persistent
-           // setStatus('error');
-           // setErrorMessage("Lost connection to sensor.");
+          // Handle intermittent errors without necessarily stopping everything
         }
       }
     }, 3000); // Fetch every 3 seconds for demo
@@ -79,13 +88,50 @@ export default function HeartTrackerPage() {
     return () => {
       clearInterval(intervalId);
       console.log("Disconnected from heart rate sensor simulation.");
-      setStatus('idle');
-      // Add cleanup logic here (e.g., disconnect Bluetooth)
+      setSensorStatus('idle');
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only on mount
 
-   // Format timestamp for X-axis label (optional)
+
+  // --- Google Fit Handlers (Placeholders) ---
+  const handleConnectGoogleFit = async () => {
+    setIsConnectingToGoogleFit(true);
+    setGoogleFitError(null);
+    console.log("Simulating Google Fit connection...");
+    // --- TODO: Implement OAuth 2.0 Flow ---
+    // 1. Redirect user to Google's authorization endpoint
+    // 2. Handle the callback, exchange code for tokens (backend recommended)
+    // 3. Store tokens securely (backend recommended)
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+
+    // Simulate success/failure
+    const success = Math.random() > 0.2; // 80% success chance
+    if (success) {
+      setIsGoogleFitConnected(true);
+      toast({ title: "Success", description: "Connected to Google Fit." });
+      // --- TODO: Fetch initial data from Google Fit API ---
+      // Example: fetchLastDayHeartRate()
+    } else {
+      setGoogleFitError("Failed to connect to Google Fit. Please try again.");
+      toast({ variant: "destructive", title: "Error", description: "Failed to connect to Google Fit." });
+    }
+    setIsConnectingToGoogleFit(false);
+  };
+
+  const handleDisconnectGoogleFit = async () => {
+    console.log("Simulating Google Fit disconnection...");
+    // --- TODO: Implement disconnect logic ---
+    // 1. Revoke OAuth token (optional, depends on desired behavior)
+    // 2. Clear stored tokens
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setIsGoogleFitConnected(false);
+    setGoogleFitError(null);
+    toast({ title: "Disconnected", description: "Disconnected from Google Fit." });
+  };
+  // --- End Google Fit Handlers ---
+
+   // Format timestamp for X-axis label
    const formatXAxis = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
@@ -93,46 +139,100 @@ export default function HeartTrackerPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Heart Rate Tracker</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+           <h1 className="text-3xl font-bold tracking-tight">Heart Rate Tracker</h1>
+           <p className="text-muted-foreground mt-1">Monitor your heart rate using sensors or Google Fit.</p>
+        </div>
+         {/* Google Fit Connect/Disconnect Button */}
+         <div>
+           {!isGoogleFitConnected ? (
+             <Button
+               onClick={handleConnectGoogleFit}
+               disabled={isConnectingToGoogleFit}
+             >
+               <LinkIcon className="mr-2 h-4 w-4" />
+               {isConnectingToGoogleFit ? "Connecting..." : "Connect Google Fit"}
+             </Button>
+           ) : (
+             <Button variant="outline" onClick={handleDisconnectGoogleFit}>
+               <Link2Off className="mr-2 h-4 w-4" />
+               Disconnect Google Fit
+             </Button>
+           )}
+        </div>
+      </div>
 
-      {status === 'error' && (
-        <Alert variant="destructive">
-          <Activity className="h-4 w-4" />
-          <AlertTitle>Sensor Error</AlertTitle>
-          <AlertDescription>{errorMessage || "Could not read data from the heart rate sensor."}</AlertDescription>
-        </Alert>
-      )}
 
-       {status === 'connecting' && (
+       {/* Error Alerts */}
+       {sensorStatus === 'error' && (
+         <Alert variant="destructive">
+           <Activity className="h-4 w-4" />
+           <AlertTitle>Sensor Error</AlertTitle>
+           <AlertDescription>{sensorErrorMessage || "Could not read data from the heart rate sensor."}</AlertDescription>
+         </Alert>
+       )}
+       {googleFitError && (
+         <Alert variant="destructive">
+           <LinkIcon className="h-4 w-4" />
+           <AlertTitle>Google Fit Error</AlertTitle>
+           <AlertDescription>{googleFitError}</AlertDescription>
+         </Alert>
+       )}
+
+       {/* Connecting Status */}
+       {(sensorStatus === 'connecting' || isConnectingToGoogleFit) && (
         <Alert>
           <Activity className="h-4 w-4" />
           <AlertTitle>Connecting...</AlertTitle>
-          <AlertDescription>Attempting to connect to your heart rate sensor. Make sure it's on and nearby.</AlertDescription>
+          <AlertDescription>
+            {isConnectingToGoogleFit ? "Attempting to connect to Google Fit..." : "Attempting to connect to your heart rate sensor. Make sure it's on and nearby."}
+          </AlertDescription>
         </Alert>
       )}
 
+      {/* Display Google Fit Connection Status */}
+      {isGoogleFitConnected && (
+        <Alert variant="default" className="border-green-500 bg-green-50 dark:bg-green-900/30">
+             <LinkIcon className="h-4 w-4 text-green-700" />
+            <AlertTitle className="text-green-800 dark:text-green-300">Google Fit Connected</AlertTitle>
+            <AlertDescription className="text-green-700 dark:text-green-400">
+              {/* Displaying simulated sensor data for now. */}
+              Currently showing real-time sensor data. Google Fit integration allows syncing historical data (implementation pending).
+            </AlertDescription>
+        </Alert>
+      )}
+
+
+       {/* Current Heart Rate Card */}
        <Card className="shadow-lg">
          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
            <CardTitle className="text-lg font-medium">Current Heart Rate</CardTitle>
+            {/* Indicate source? Maybe too complex for now */}
            <HeartPulse className="h-6 w-6 text-destructive" />
          </CardHeader>
          <CardContent>
            <div className={`text-6xl font-bold ${currentBpm ? 'text-destructive' : 'text-muted-foreground'}`}>
-             {status === 'connecting' ? '--' : currentBpm ?? '--'}
+              {sensorStatus === 'connecting' && !currentBpm ? '--' : currentBpm ?? '--'}
            </div>
            <p className="text-xs text-muted-foreground">
-              {status === 'active' ? 'Beats per minute (BPM) - Real-time' : status === 'connecting' ? 'Connecting to sensor...' : status === 'error' ? 'Sensor error' : 'Sensor disconnected'}
+              {sensorStatus === 'active' ? 'Beats per minute (BPM) - Real-time Sensor' : sensorStatus === 'connecting' ? 'Connecting to sensor...' : sensorStatus === 'error' ? 'Sensor error' : 'Sensor disconnected'}
            </p>
          </CardContent>
        </Card>
 
-      <Card className="shadow-lg">
+       {/* Heart Rate Trend Chart */}
+       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Heart Rate Trend</CardTitle>
-          <CardDescription>Your heart rate over the last minute.</CardDescription>
+          {/* Adjust description based on source? */}
+          <CardDescription>
+             {isGoogleFitConnected ? "Real-time sensor trend (Google Fit sync for history pending)." : "Your heart rate over the last minute (from sensor)."}
+           </CardDescription>
         </CardHeader>
         <CardContent>
-           {status === 'active' && heartRateData.length > 1 ? (
+           {/* Logic remains based on sensor data for now */}
+           {(sensorStatus === 'active' || sensorStatus === 'connecting') && heartRateData.length > 1 ? (
              <ChartContainer config={chartConfig} className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
@@ -150,7 +250,7 @@ export default function HeartTrackerPage() {
                   />
                   <YAxis
                     stroke="hsl(var(--muted-foreground))"
-                    domain={['dataMin - 5', 'dataMax + 5']} // Dynamic domain with padding
+                    domain={['dataMin - 5', 'dataMax + 5']}
                     tickLine={false}
                     axisLine={false}
                     fontSize={12}
@@ -163,21 +263,18 @@ export default function HeartTrackerPage() {
                   <Line
                     type="monotone"
                     dataKey="bpm"
-                    stroke="var(--color-bpm)" // Use color from config
+                    stroke="var(--color-bpm)"
                     strokeWidth={2}
                     dot={false}
-                    isAnimationActive={true} // Smoother animation
+                    isAnimationActive={true}
                     animationDuration={300}
                   />
-                  {/* Optional: Add Reference lines for normal ranges */}
-                  {/* <ReferenceLine y={100} label="High" stroke="orange" strokeDasharray="3 3" />
-                  <ReferenceLine y={60} label="Low" stroke="lightblue" strokeDasharray="3 3" /> */}
                 </LineChart>
               </ResponsiveContainer>
             </ChartContainer>
            ) : (
              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-               {status === 'connecting' ? 'Waiting for sensor data...' : status === 'error' ? 'Cannot display chart due to sensor error.' : 'Not enough data to display chart.'}
+               {sensorStatus === 'connecting' ? 'Waiting for sensor data...' : sensorStatus === 'error' ? 'Cannot display chart due to sensor error.' : 'Not enough data to display chart.'}
              </div>
            )}
         </CardContent>
@@ -188,7 +285,7 @@ export default function HeartTrackerPage() {
          <Activity className="h-4 w-4" />
          <AlertTitle>Feature Coming Soon!</AlertTitle>
          <AlertDescription>
-           Advanced analysis, history, and personalized insights based on your heart rate data are planned for future updates. Ensure data privacy and security compliance (GDPR/HIPAA) will be prioritized. Sensor calibration and noise filtering are handled by the underlying hardware/service.
+           Integration with Google Fit for historical data, advanced analysis, and personalized insights are planned. Ensure data privacy and security compliance (GDPR/HIPAA) will be prioritized. Sensor calibration and noise filtering are handled by the underlying hardware/service.
          </AlertDescription>
        </Alert>
     </div>
