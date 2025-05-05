@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Mic, MicOff, Video, VideoOff, PhoneOff, User, Clock, Circle, Send, Smile, Paperclip, MoreHorizontal } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, PhoneOff, User, Clock, Circle, Send, Smile, Paperclip, MoreHorizontal, MessageSquare } from "lucide-react"; // Re-added MessageSquare
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -260,7 +260,7 @@ export default function VideoCallPage() {
                <span className="sr-only">Screen Share</span>
             </Button>
              <Button variant="outline" size="icon" disabled={callStatus !== "connected"} className="rounded-full w-12 h-12">
-               <MessageSquare /> {/* Assuming chat toggle or similar */}
+               <MessageSquare /> {/* Re-added MessageSquare icon */}
                 <span className="sr-only">Chat</span>
             </Button>
             <Button variant="outline" size="icon" disabled={callStatus !== "connected"} className="rounded-full w-12 h-12">
