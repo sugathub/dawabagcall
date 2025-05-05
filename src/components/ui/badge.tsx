@@ -8,8 +8,10 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        default: // Use secondary as the new default visually
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        primary: // Keep primary variant available if needed
+           "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary:
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
@@ -18,7 +20,7 @@ const badgeVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "default", // Keep logical default, but visually it's secondary now
     },
   }
 )

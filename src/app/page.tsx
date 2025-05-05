@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stethoscope, HeartPulse, ShoppingCart, Video } from "lucide-react";
 import Link from "next/link";
-import Image from 'next/image';
+// Image import is no longer needed for the header image
+// import Image from 'next/image';
 
 
 export default function Home() {
@@ -15,22 +16,7 @@ export default function Home() {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Connect with healthcare professionals, monitor your heart rate, and purchase medical supplies, all from the comfort of your home.
         </p>
-         <div className="relative w-full max-w-4xl h-64 mx-auto rounded-lg overflow-hidden shadow-lg mt-8">
-          <Image
-            src="https://picsum.photos/1024/400"
-            alt="Doctor consulting patient online"
-            layout="fill"
-            objectFit="cover"
-            data-ai-hint="doctor online consultation"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-              <Link href="/video-call">
-                <Video className="mr-2" /> Start a Video Call
-              </Link>
-            </Button>
-          </div>
-        </div>
+         {/* Removed the large header image and overlay button */}
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
@@ -44,7 +30,7 @@ export default function Home() {
               Securely connect with certified doctors via video call for consultations and advice.
             </CardDescription>
             <Button variant="outline" asChild>
-               <Link href="/video-call">Start Call</Link>
+               <Link href="/video-call"> <Video className="mr-2 h-4 w-4" /> Start Call</Link>
             </Button>
           </CardContent>
         </Card>
@@ -56,14 +42,12 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <CardDescription className="mb-4">
-              Monitor your heart rate in real-time using integrated sensor technology. (Coming Soon)
+              Monitor your heart rate in real-time using integrated sensor technology.
             </CardDescription>
-             <Button variant="outline" disabled>
-               View Tracker
-            </Button>
-             {/* <Button variant="outline" asChild>
+             {/* Link enabled, points to the existing page */}
+             <Button variant="outline" asChild>
                <Link href="/heart-tracker">View Tracker</Link>
-            </Button> */}
+            </Button>
           </CardContent>
         </Card>
 
@@ -88,6 +72,20 @@ export default function Home() {
          <h2 className="text-3xl font-semibold text-primary">How It Works</h2>
          <p className="text-muted-foreground">Simple steps to get started with MediCall.</p>
          {/* Add steps or visual guide here */}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left pt-4">
+            <div className="p-4 border rounded-lg bg-card">
+              <h3 className="font-semibold mb-2">1. Schedule</h3>
+              <p className="text-sm text-muted-foreground">Find a doctor and book an appointment that fits your schedule.</p>
+            </div>
+             <div className="p-4 border rounded-lg bg-card">
+              <h3 className="font-semibold mb-2">2. Connect</h3>
+              <p className="text-sm text-muted-foreground">Join the secure video call at your scheduled time.</p>
+            </div>
+             <div className="p-4 border rounded-lg bg-card">
+              <h3 className="font-semibold mb-2">3. Consult</h3>
+              <p className="text-sm text-muted-foreground">Discuss your health concerns with the doctor and get professional advice.</p>
+            </div>
+         </div>
        </section>
     </div>
   );
