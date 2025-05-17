@@ -1,10 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Stethoscope, HeartPulse, ShoppingCart, Video } from "lucide-react";
+import { Stethoscope, HeartPulse, ShoppingCart, Video, Activity, ShoppingBag } from "lucide-react";
 import Link from "next/link";
-// Image import is no longer needed for the header image
-// import Image from 'next/image';
-
 
 export default function Home() {
   return (
@@ -16,7 +14,6 @@ export default function Home() {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Connect with healthcare professionals, monitor your heart rate, and purchase medical supplies, all from the comfort of your home.
         </p>
-         {/* Removed the large header image and overlay button */}
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
@@ -44,9 +41,8 @@ export default function Home() {
             <CardDescription className="mb-4">
               Monitor your heart rate in real-time using integrated sensor technology.
             </CardDescription>
-             {/* Link enabled, points to the existing page */}
              <Button variant="outline" asChild>
-               <Link href="/heart-tracker">View Tracker</Link>
+               <Link href="/heart-tracker"><Activity className="mr-2 h-4 w-4" />View Tracker</Link>
             </Button>
           </CardContent>
         </Card>
@@ -61,17 +57,15 @@ export default function Home() {
               Browse and purchase essential medical products online.
             </CardDescription>
             <Button variant="outline" asChild>
-               <Link href="/store">Shop Now</Link>
+               <Link href="/store"><ShoppingBag className="mr-2 h-4 w-4" />Shop Now</Link>
             </Button>
           </CardContent>
         </Card>
       </section>
 
-       {/* Placeholder section for How it Works or Testimonials */}
        <section className="w-full max-w-5xl text-center space-y-4 py-8">
          <h2 className="text-3xl font-semibold text-primary">How It Works</h2>
          <p className="text-muted-foreground">Simple steps to get started with MediCall.</p>
-         {/* Add steps or visual guide here */}
          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left pt-4">
             <div className="p-4 border rounded-lg bg-card">
               <h3 className="font-semibold mb-2">1. Schedule</h3>
