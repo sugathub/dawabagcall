@@ -1,3 +1,4 @@
+
 'use client'; // Add 'use client' because we need useSidebar hook
 
 import Link from "next/link";
@@ -31,8 +32,8 @@ export function Header() {
 
         {/* Logo/Brand (visible on larger screens where sidebar might be collapsed) */}
         <Link href="/" className="mr-6 hidden items-center space-x-2 md:flex">
-           {/* Placeholder for .hello doc. logo */}
-           <span className="font-bold text-lg text-primary">.hello doc.</span>
+           {/* Placeholder for dawabagCall logo */}
+           <span className="font-bold text-lg text-primary">dawabagCall</span>
         </Link>
 
 

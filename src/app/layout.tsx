@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 // Removed GeistMono import as it's not found and likely unused.
@@ -10,7 +11,7 @@ import { SidebarProvider, Sidebar, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar";
 
 export const metadata: Metadata = {
-  title: "MediCall",
+  title: "dawabagCall",
   description: "Online video calls with doctors and health tracking.",
 };
 
