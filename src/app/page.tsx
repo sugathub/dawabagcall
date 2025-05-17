@@ -9,7 +9,7 @@ export default function Home() {
     <div className="flex flex-col items-center space-y-12">
       <section className="text-center space-y-4">
         <h1 className="text-4xl font-bold tracking-tight lg:text-5xl text-primary">
-          Welcome to MediCall
+          Welcome to Dawabagcall
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Connect with healthcare professionals, monitor your heart rate, and purchase medical supplies, all from the comfort of your home.
