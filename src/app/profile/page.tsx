@@ -55,6 +55,7 @@ const profileFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters.").max(50, "Name cannot exceed 50 characters."),
   email: z.string().email("Invalid email address."),
   phone: z.string().min(10, "Phone number seems too short.").max(20, "Phone number seems too long."),
+  avatarUrl: z.string(), // Stores the image URL or data URL
   address: z.object({
     street: z.string().min(3, "Street address seems too short.").max(100),
     city: z.string().min(2, "City name seems too short.").max(50),
@@ -71,6 +72,7 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = React.useState(false);
   const [profileData, setProfileData] = React.useState<UserProfile>(mockUserProfile);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -78,6 +80,7 @@ export default function ProfilePage() {
       name: profileData.name,
       email: profileData.email,
       phone: profileData.phone,
+      avatarUrl: profileData.avatarUrl,
       address: { ...profileData.address },
       medicalSummary: profileData.medicalSummary,
     },
@@ -85,12 +88,11 @@ export default function ProfilePage() {
   });
 
   React.useEffect(() => {
-    // Reset form when profileData changes (e.g. after save or cancel)
-    // or when toggling edit mode.
     form.reset({
       name: profileData.name,
       email: profileData.email,
       phone: profileData.phone,
+      avatarUrl: profileData.avatarUrl,
       address: { ...profileData.address },
       medicalSummary: profileData.medicalSummary,
     });
@@ -99,20 +101,18 @@ export default function ProfilePage() {
 
   const handleToggleEdit = () => {
     setIsEditing(!isEditing);
-    if (isEditing) { // Was editing, now viewing (Cancel)
-        form.reset(profileData); // Reset form to original data
+    if (isEditing) { 
+        form.reset(profileData); 
     }
-    // If switching to edit, useEffect will reset form with current profileData
   };
 
   const onSubmit = (data: ProfileFormValues) => {
-    // Simulate saving data
-    console.log("Saving profile data:", data);
     const updatedProfile: UserProfile = {
-      ...profileData, // Keep memberSince and avatarUrl
+      ...profileData,
       name: data.name,
       email: data.email,
       phone: data.phone,
+      avatarUrl: data.avatarUrl,
       address: { ...data.address },
       medicalSummary: data.medicalSummary || "",
     };
@@ -122,6 +122,17 @@ export default function ProfilePage() {
       title: "Profile Updated",
       description: "Your profile information has been saved.",
     });
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue("avatarUrl", reader.result as string, { shouldValidate: true, shouldDirty: true });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -157,10 +168,31 @@ export default function ProfilePage() {
           <Card className="shadow-lg">
             <CardHeader className="pb-4">
               <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20 border">
-                  <AvatarImage src={profileData.avatarUrl} alt={profileData.name} data-ai-hint="person avatar" />
-                  <AvatarFallback><User className="h-10 w-10" /></AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-20 w-20 border">
+                    <AvatarImage src={form.watch("avatarUrl")} alt={profileData.name} data-ai-hint="person avatar" />
+                    <AvatarFallback><User className="h-10 w-10" /></AvatarFallback>
+                  </Avatar>
+                  {isEditing && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="absolute -bottom-1 -right-1 rounded-full h-8 w-8 bg-background hover:bg-muted border-border shadow-sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      aria-label="Change profile photo"
+                    >
+                      <Edit3 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
                 <div>
                   <CardTitle className="text-2xl">{profileData.name}</CardTitle>
                   <CardDescription>Member since: {new Date(profileData.memberSince).toLocaleDateString()}</CardDescription>
