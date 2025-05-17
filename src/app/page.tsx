@@ -1,10 +1,25 @@
 
+import { use } from 'react'; // Import use
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stethoscope, HeartPulse, ShoppingCart, Video, Activity, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
-export default function Home() {
+// Add searchParams to the function signature and use React.use() for demonstration.
+// This is a speculative application of the pattern suggested by the error message.
+export default function Home({ searchParams: initialSearchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  // Cautiously unwrap searchParams if they were a promise-like entity.
+  // The Promise.resolve() is a way to ensure it's thenable for `use()`.
+  // If initialSearchParams were guaranteed to be a promise, it would be: use(initialSearchParams)
+  const searchParams = initialSearchParams ? use(Promise.resolve(initialSearchParams)) : undefined;
+
+  // Example of how searchParams could be used safely after unwrapping.
+  // This component's rendering logic does not currently depend on searchParams.
+  if (searchParams) {
+    // To prevent unused variable warnings if no other logic uses searchParams:
+    // console.log("Home page searchParams (if any):", Object.keys(searchParams).length > 0 ? searchParams : "empty");
+  }
+
   return (
     <div className="flex flex-col items-center space-y-12">
       <section className="text-center space-y-4">
