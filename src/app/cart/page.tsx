@@ -1,20 +1,22 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCart } from '@/contexts/cart-context';
+import { useCart, type CartItem } from '@/contexts/cart-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, ShoppingCart, MinusCircle, PlusCircle, PackageOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { OrderStatusDisplay, type OrderStatus } from '@/components/order-status'; // Import the new component
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const [currentOrderStatus, setCurrentOrderStatus] = useState<OrderStatus | null>(null);
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -29,12 +31,48 @@ export default function CartPage() {
   };
   
   const handleCheckout = () => {
+    if (cartItems.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "Cart is Empty",
+            description: "Please add items to your cart before proceeding to checkout."
+        });
+        return;
+    }
+
+    const orderId = `MEDICALL-${Date.now().toString().slice(-6)}`;
+    const estimatedDelivery = new Date();
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + 5); // 5 days from now
+
+    const newOrderStatus: OrderStatus = {
+        orderId,
+        items: [...cartItems], // Create a copy of cart items for the order
+        currentStep: 1, // 0: Placed, 1: Confirmed, 2: Processing, 3: Shipped, etc.
+        estimatedDeliveryDate: estimatedDelivery.toISOString().split('T')[0],
+        trackingSteps: [
+            { name: "Order Placed", date: new Date().toISOString().split('T')[0], status: "completed" },
+            { name: "Order Confirmed", date: new Date().toISOString().split('T')[0], status: "active" },
+            { name: "Processing", status: "pending" },
+            { name: "Shipped", status: "pending" },
+            { name: "Out for Delivery", status: "pending" },
+            { name: "Delivered", status: "pending" },
+        ]
+    };
+    setCurrentOrderStatus(newOrderStatus);
+    
+    // Optionally clear the cart from context after "placing order"
+    // clearCart(); 
+    // For now, we are not clearing the cart, so user can go back and see it.
+
     toast({
-        title: "Checkout Initiated (Placeholder)",
-        description: "This would normally proceed to a payment gateway."
+        title: "Order Placed!",
+        description: `Your order ${orderId} has been successfully placed.`,
     });
-    // clearCart(); // Optionally clear cart after checkout
   };
+
+  if (currentOrderStatus) {
+    return <OrderStatusDisplay order={currentOrderStatus} />;
+  }
 
   return (
     <div className="space-y-8">
