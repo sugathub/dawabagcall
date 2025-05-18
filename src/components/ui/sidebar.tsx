@@ -22,9 +22,9 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "18rem" // Increased width
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "4rem" // Slightly wider icon-only state
+const SIDEBAR_WIDTH = "14rem"; // Decreased from 18rem
+const SIDEBAR_WIDTH_MOBILE = "14rem"; // Adjusted to match
+const SIDEBAR_WIDTH_ICON = "3.5rem"; // Decreased from 4rem
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
@@ -515,5 +515,3 @@ export {
   // SidebarTrigger, // Removed Trigger (use Button externally)
   useSidebar,
 }
-
-    
