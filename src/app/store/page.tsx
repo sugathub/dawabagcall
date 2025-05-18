@@ -36,18 +36,25 @@ export default function StorePage() {
 
   const handleAddToCart = async (product: MedicalProduct) => {
     setAddingToCart(product.id);
-    // Simulate adding to cart
-    const result = await simulateAddToCart(product.id, 1);
-    if (result.success) {
-      toast({
-        title: "Added to Cart!",
-        description: `${product.name} has been added to your cart.`,
-      });
-    } else {
+    try {
+      const result = await simulateAddToCart(product.id, 1);
+      if (result.success) {
+        toast({
+          title: "Added to Cart!",
+          description: `${product.name} has been added to your cart.`,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Failed to Add",
+          description: result.message || `Could not add ${product.name} to cart.`,
+        });
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "Failed to Add",
-        description: result.message || `Could not add ${product.name} to cart.`,
+        title: "Error",
+        description: "An unexpected error occurred while adding to cart.",
       });
     }
     setAddingToCart(null);
@@ -89,12 +96,12 @@ export default function StorePage() {
                  />
                </div>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{product.name}</CardTitle>
-                <CardDescription className="text-sm h-10 overflow-hidden text-ellipsis">
+                <CardTitle className="text-lg h-12 overflow-hidden">{product.name}</CardTitle> {/* Ensure title area consistent height */}
+                <CardDescription className="text-sm h-16 overflow-y-auto"> {/* Consistent height and scroll for long descriptions */}
                   {product.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="flex-grow pt-2 pb-4"> {/* Adjust padding */}
                  <p className="text-xl font-semibold text-primary">
                     ₹{product.price.toFixed(2)}
                  </p>
