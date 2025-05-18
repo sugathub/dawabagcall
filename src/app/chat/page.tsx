@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, ChevronRight } from "lucide-react";
@@ -12,6 +14,12 @@ interface ChatSession {
   lastMessageSnippet: string;
   unread?: boolean;
 }
+
+// Consistent user for chat history context
+const mockUser = {
+  name: "Alex Johnson", // From profile page
+  avatarSeed: "userprofile", // From profile page
+};
 
 const mockChatSessions: ChatSession[] = [
   {
@@ -61,20 +69,18 @@ export default function ChatHistoryPage() {
         <Card>
           <CardHeader>
             <CardTitle>Past Consultations</CardTitle>
-            <CardDescription>Select a conversation to view the details (details page not implemented).</CardDescription>
+            <CardDescription>Select a conversation to view the details.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <ul className="divide-y divide-border">
               {mockChatSessions.map((session) => (
                 <li key={session.id}>
-                  {/* In a real app, this link would go to the specific chat page */}
-                  <Link href={`/chat/#${session.id}`} legacyBehavior>
-                    <a className="flex items-center p-4 hover:bg-muted/50 transition-colors cursor-pointer">
+                  <Link href={`/chat/${session.id}`} className="flex items-center p-4 hover:bg-muted/50 transition-colors cursor-pointer">
                       <Avatar className="h-10 w-10 mr-4">
                         <AvatarImage 
                           src={`https://picsum.photos/seed/${session.doctorAvatarSeed}/40/40`} 
                           alt={session.doctorName} 
-                          data-ai-hint="doctor avatar" 
+                          data-ai-hint="doctor avatar"
                         />
                         <AvatarFallback>{session.doctorName.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
@@ -91,7 +97,6 @@ export default function ChatHistoryPage() {
                         <div aria-label="Unread messages" className="ml-3 w-2.5 h-2.5 bg-primary rounded-full flex-shrink-0"></div>
                       )}
                       <ChevronRight className="ml-3 h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    </a>
                   </Link>
                 </li>
               ))}
@@ -105,7 +110,7 @@ export default function ChatHistoryPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-48">
-              <MessageCircle className="w-12 h-12 mb-4" />
+              <MessageCircle className="w-12 h-12 mb-4 opacity-50" />
               <p>You have no past chat conversations.</p>
               <p>Completed video consultations will appear here.</p>
             </div>
