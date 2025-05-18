@@ -4,16 +4,18 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getMedicalProducts, type MedicalProduct, addToCart as simulateAddToCart } from "@/services/medical-sales";
+import { getMedicalProducts, type MedicalProduct } from "@/services/medical-sales";
 import Image from 'next/image';
 import { ShoppingCart, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from '@/contexts/cart-context'; // Import useCart
 
 export default function StorePage() {
   const [products, setProducts] = useState<MedicalProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState<string | null>(null); // Store product ID being added
   const { toast } = useToast();
+  const { addToCart } = useCart(); // Get addToCart from context
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -36,27 +38,16 @@ export default function StorePage() {
 
   const handleAddToCart = async (product: MedicalProduct) => {
     setAddingToCart(product.id);
-    try {
-      const result = await simulateAddToCart(product.id, 1);
-      if (result.success) {
-        toast({
-          title: "Added to Cart!",
-          description: `${product.name} has been added to your cart.`,
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Failed to Add",
-          description: result.message || `Could not add ${product.name} to cart.`,
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred while adding to cart.",
-      });
-    }
+    // Simulate a short delay for visual feedback, then add to context
+    await new Promise(resolve => setTimeout(resolve, 300)); 
+    
+    addToCart(product, 1); // Add to cart context
+    
+    toast({
+      title: "Added to Cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
+    
     setAddingToCart(null);
   };
 

@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, MessageSquare, Settings, User, HelpCircle, Headset, PanelLeft } from "lucide-react";
+import { Home, Calendar, MessageSquare, Settings, User, HelpCircle, Headset, PanelLeft, ShoppingCart } from "lucide-react"; // Added ShoppingCart
 import {
   Sidebar,
   SidebarContent,
@@ -13,19 +13,23 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
+  // SidebarTrigger, // Commented out as it's not used
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/cart-context"; // Import useCart
 
-const navItems = [
+const navItemsBase = [
   { href: "/", label: "Home", icon: Home },
   { href: "/schedule", label: "Schedule", icon: Calendar },
-  { href: "/chat", label: "Chat", icon: MessageSquare, badge: 2 }, // Example badge
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/chat", label: "Chat", icon: MessageSquare, badgeCount: 2 }, // Example badge
+];
+
+const userNavItems = [
   { href: "/profile", label: "Profile", icon: User },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 const supportItems = [
@@ -36,12 +40,20 @@ const supportItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { state, isMobile, toggleSidebar } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
+  const { totalItems: cartTotalItems } = useCart();
 
   const isActive = (href: string) => {
     // Handle exact match for home page, partial match otherwise
     return href === "/" ? pathname === href : pathname.startsWith(href);
   };
+
+  // Combine nav items and add Cart dynamically
+  const navItems = [
+    ...navItemsBase,
+    { href: "/cart", label: "Cart", icon: ShoppingCart, badgeCount: cartTotalItems },
+    ...userNavItems
+  ];
 
   return (
     <>
@@ -79,13 +91,13 @@ export function AppSidebar() {
                   <a>
                     <item.icon />
                     <span className={cn({"hidden": state === 'collapsed'})}>{item.label}</span>
-                     {item.badge && state === 'expanded' && (
+                     {item.badgeCount && item.badgeCount > 0 && state === 'expanded' && (
                        <Badge variant="secondary" className="ml-auto h-5">
-                         {item.badge}
+                         {item.badgeCount > 9 ? '9+' : item.badgeCount}
                        </Badge>
                      )}
                      {/* Show badge dot when collapsed */}
-                      {item.badge && state === 'collapsed' && (
+                      {item.badgeCount && item.badgeCount > 0 && state === 'collapsed' && (
                          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-primary ring-2 ring-sidebar-background" />
                       )}
                   </a>
