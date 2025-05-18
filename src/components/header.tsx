@@ -17,6 +17,7 @@ import { useSidebar } from "@/components/ui/sidebar"; // Import useSidebar hook
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context"; // Import useCart
 import { Badge } from "@/components/ui/badge"; // Import Badge
+import { ThemeToggleButton } from "./theme-toggle-button"; // Import ThemeToggleButton
 
 export function Header() {
   const { toggleSidebar } = useSidebar(); // Get the toggle function
@@ -46,6 +47,7 @@ export function Header() {
 
         {/* Header Actions */}
         <div className="flex items-center space-x-2 sm:space-x-4">
+          <ThemeToggleButton /> {/* Add ThemeToggleButton here */}
           <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
