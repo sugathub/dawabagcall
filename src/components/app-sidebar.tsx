@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, MessageSquare, Settings, User, HelpCircle, Headset, PanelLeft, ShoppingCart } from "lucide-react"; // Added ShoppingCart
+import { Home, Calendar, MessageSquare, Settings, User, HelpCircle, Headset, PanelLeft, ShoppingCart, ShoppingBag, ScanLine } from "lucide-react"; 
 import {
   Sidebar,
   SidebarContent,
@@ -13,18 +13,19 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  // SidebarTrigger, // Commented out as it's not used
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useCart } from "@/contexts/cart-context"; // Import useCart
+import { useCart } from "@/contexts/cart-context"; 
 
-const navItemsBase = [
+const mainNavItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/schedule", label: "Schedule", icon: Calendar },
-  { href: "/chat", label: "Chat", icon: MessageSquare, badgeCount: 2 }, // Example badge
+  { href: "/chat", label: "Chat", icon: MessageSquare, badgeCount: 2 }, 
+  { href: "/store", label: "Store", icon: ShoppingBag }, 
+  { href: "/prescription-scanner", label: "Scan Rx", icon: ScanLine }, 
 ];
 
 const userNavItems = [
@@ -44,27 +45,21 @@ export function AppSidebar() {
   const { totalItems: cartTotalItems } = useCart();
 
   const isActive = (href: string) => {
-    // Handle exact match for home page, partial match otherwise
     return href === "/" ? pathname === href : pathname.startsWith(href);
   };
 
-  // Combine nav items and add Cart dynamically
   const navItems = [
-    ...navItemsBase,
+    ...mainNavItems,
     { href: "/cart", label: "Cart", icon: ShoppingCart, badgeCount: cartTotalItems },
     ...userNavItems
   ];
 
   return (
     <>
-       {/* Header with Logo and Toggle */}
       <SidebarHeader className={cn("flex items-center justify-between", {"justify-center": state === 'collapsed'})}>
-         {/* Logo - Text based on image */}
          <Link href="/" className={cn("font-bold text-xl text-primary", {"hidden": state === 'collapsed'})}>
            dawabagCall
          </Link>
-
-         {/* Toggle Button (Desktop only) */}
          <Button
             variant="ghost"
             size="icon"
@@ -76,7 +71,6 @@ export function AppSidebar() {
          </Button>
        </SidebarHeader>
 
-      {/* Main Navigation */}
       <SidebarContent className="p-2 flex-1">
         <SidebarMenu>
           {navItems.map((item) => (
@@ -96,7 +90,6 @@ export function AppSidebar() {
                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
                        </Badge>
                      )}
-                     {/* Show badge dot when collapsed */}
                       {item.badgeCount && item.badgeCount > 0 && state === 'collapsed' && (
                          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-primary ring-2 ring-sidebar-background" />
                       )}
@@ -108,7 +101,6 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
 
-       {/* Footer Support Links */}
        <SidebarFooter className="p-2 border-t border-sidebar-border">
          <SidebarMenu>
            {supportItems.map((item) => (
@@ -133,3 +125,5 @@ export function AppSidebar() {
      </>
   );
 }
+
+    

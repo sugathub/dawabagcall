@@ -6,16 +6,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { getMedicalProducts, type MedicalProduct } from "@/services/medical-sales";
 import Image from 'next/image';
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { ShoppingCart, Loader2, ScanLine } from "lucide-react"; // Added ScanLine
 import { useToast } from "@/hooks/use-toast";
-import { useCart } from '@/contexts/cart-context'; // Import useCart
+import { useCart } from '@/contexts/cart-context'; 
+import Link from 'next/link'; // Added Link
 
 export default function StorePage() {
   const [products, setProducts] = useState<MedicalProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addingToCart, setAddingToCart] = useState<string | null>(null); // Store product ID being added
+  const [addingToCart, setAddingToCart] = useState<string | null>(null); 
   const { toast } = useToast();
-  const { addToCart } = useCart(); // Get addToCart from context
+  const { addToCart } = useCart(); 
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -38,10 +39,9 @@ export default function StorePage() {
 
   const handleAddToCart = async (product: MedicalProduct) => {
     setAddingToCart(product.id);
-    // Simulate a short delay for visual feedback, then add to context
     await new Promise(resolve => setTimeout(resolve, 300)); 
     
-    addToCart(product, 1); // Add to cart context
+    addToCart(product, 1); 
     
     toast({
       title: "Added to Cart!",
@@ -73,6 +73,25 @@ export default function StorePage() {
         <p className="text-muted-foreground mt-2">Browse and purchase essential medical products.</p>
       </section>
 
+      <Card className="shadow-md hover:shadow-lg transition-shadow bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-4 pb-3">
+            <div className='flex-grow'>
+                <CardTitle className="text-lg font-medium text-primary flex items-center">
+                    <ScanLine className="h-6 w-6 mr-2" />
+                    Have a Prescription?
+                </CardTitle>
+                <CardDescription className="mt-1">
+                    Use our scanner to upload your prescription and find products quickly or get assistance. (AI feature is simulated)
+                </CardDescription>
+            </div>
+            <Button variant="default" asChild className="w-full sm:w-auto mt-2 sm:mt-0 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0">
+               <Link href="/prescription-scanner">
+                 <ScanLine className="mr-2 h-4 w-4" /> Scan Prescription
+               </Link>
+            </Button>
+        </CardHeader>
+      </Card>
+
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
@@ -87,10 +106,10 @@ export default function StorePage() {
                  />
                </div>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2 h-[3.5rem]"> {/* Adjusted: line-clamp, height, font-semibold, hover effect */}
+                <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2 h-[3.5rem]">
                   {product.name}
                 </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem]"> {/* Adjusted: line-clamp, height */}
+                <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem]">
                   {product.description}
                 </CardDescription>
               </CardHeader>
@@ -124,3 +143,5 @@ export default function StorePage() {
     </div>
   );
 }
+
+    
