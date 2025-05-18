@@ -43,39 +43,37 @@
   }
 
   .dark {
-    /* Define appropriate dark mode theme based on light theme */
-    /* Keeping existing dark theme, can be refined later */
-    --background: 210 10% 10%;
+    --background: 210 10% 5%; /* Darker */
     --foreground: 210 40% 98%;
-    --card: 210 10% 15%;
+    --card: 210 10% 8%; /* Darker */
     --card-foreground: 210 40% 98%;
-    --popover: 210 10% 10%;
+    --popover: 210 10% 5%; /* Darker */
     --popover-foreground: 210 40% 98%;
-    --primary: 250 70% 65%; /* Adjusted Purple for dark */
+    --primary: 250 70% 65%; 
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 20%;
+    --secondary: 210 10% 12%; /* Darker */
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 10% 20%;
+    --muted: 210 10% 12%; /* Darker */
     --muted-foreground: 210 10% 60%;
-    --accent: 225 70% 60%; /* Adjusted Blue for dark */
+    --accent: 225 70% 60%; 
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 25%;
-    --input: 210 10% 25%;
-    --ring: 250 70% 65%; /* Adjusted Purple */
+    --border: 210 10% 15%; /* Darker */
+    --input: 210 10% 15%; /* Darker */
+    --ring: 250 70% 65%; 
     --chart-1: 250 70% 65%;
     --chart-2: 225 70% 60%;
     --chart-3: 210 10% 60%;
     --chart-4: 250 70% 75%;
     --chart-5: 225 70% 70%;
-    --sidebar-background: 210 10% 12%; /* Darker sidebar */
-    --sidebar-foreground: 210 40% 90%; /* Lighter text */
-    --sidebar-primary: 250 70% 65%; /* Adjusted Purple */
+    --sidebar-background: 210 10% 7%; /* Darker sidebar */
+    --sidebar-foreground: 210 40% 90%; 
+    --sidebar-primary: 250 70% 65%; 
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 10% 25%; /* Dark accent background */
-    --sidebar-accent-foreground: 250 70% 70%; /* Lighter Purple for active text */
-    --sidebar-border: 210 10% 20%;
+    --sidebar-accent: 210 10% 18%; /* Darker accent background */
+    --sidebar-accent-foreground: 250 70% 70%; 
+    --sidebar-border: 210 10% 12%; /* Darker */
     --sidebar-ring: 250 70% 65%;
   }
 }
