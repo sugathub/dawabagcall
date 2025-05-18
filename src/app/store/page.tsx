@@ -76,7 +76,7 @@ export default function StorePage() {
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card key={product.id} className="flex flex-col overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <Card key={product.id} className="group flex flex-col overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                <div className="relative w-full h-48 bg-muted">
                  <Image
                    src={product.imageUrl || `https://placehold.co/300x200.png?text=${encodeURIComponent(product.name)}`}
@@ -87,12 +87,14 @@ export default function StorePage() {
                  />
                </div>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg h-12 overflow-hidden">{product.name}</CardTitle> {/* Ensure title area consistent height */}
-                <CardDescription className="text-sm h-16 overflow-y-auto"> {/* Consistent height and scroll for long descriptions */}
+                <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2 h-[3.5rem]"> {/* Adjusted: line-clamp, height, font-semibold, hover effect */}
+                  {product.name}
+                </CardTitle>
+                <CardDescription className="text-sm text-muted-foreground line-clamp-3 h-[3.75rem]"> {/* Adjusted: line-clamp, height */}
                   {product.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow pt-2 pb-4"> {/* Adjust padding */}
+              <CardContent className="flex-grow pt-2 pb-4"> 
                  <p className="text-xl font-semibold text-primary">
                     ₹{product.price.toFixed(2)}
                  </p>
