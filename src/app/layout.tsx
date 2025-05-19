@@ -11,7 +11,7 @@ import { CartProvider } from "@/contexts/cart-context"; // Import CartProvider
 import { ThemeProvider } from "next-themes"; // Import ThemeProvider
 
 export const metadata: Metadata = {
-  title: "dawabagCall",
+  title: "Dawabag Pharmacy",
   description: "Online video calls with doctors and health tracking.",
 };
 

@@ -58,7 +58,7 @@ export function AppSidebar() {
     <>
       <SidebarHeader className={cn("flex items-center justify-between", {"justify-center": state === 'collapsed'})}>
          <Link href="/" className={cn("font-bold text-xl text-primary", {"hidden": state === 'collapsed'})}>
-           dawabagCall
+           Dawabag Pharmacy
          </Link>
          <Button
             variant="ghost"
